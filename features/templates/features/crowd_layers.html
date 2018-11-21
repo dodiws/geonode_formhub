@@ -1,0 +1,39 @@
+{% extends "site_base.html" %}
+{% load i18n %}
+{% load pagination_tags %}
+{% load staticfiles %}
+{% load url from future %}
+
+{% block title %} {% trans "Explore Crowd Layers" %} - {{ block.super }} {% endblock %}
+
+{% block body_class %}crowd{% endblock %}
+
+{% block body %}
+    <div class="span12">
+      <h2 class="page-title">{% trans "Explore Crowd Layers" %}</h2>
+    </div>
+    <div class="list">
+    {% for layer in layers %}
+      {% include "features/_crowd_layer_list_item.html" %}
+    {% empty %}
+    <p>There are no crowd layers yet</p>
+    {% endfor %}
+    </div>
+ {% endblock %}
+
+{% block extra_script %}
+  {% if GEONODE_SECURITY_ENABLED %}
+    {% include "_permissions_form_js.html" %}
+  {% endif %}
+  <script type="text/javascript">
+      {% if HAYSTACK_SEARCH %}
+          SEARCH_URL = '{% url 'api_get_search' api_name='api' resource_name='base' %}?type__in=layer'
+      {% else %}
+          SEARCH_URL = '{% url 'api_dispatch_list' api_name='api' resource_name='layers' %}';
+      {% endif %}
+    FILTER_TYPE = 'layer';
+  </script>
+  {% with include_spatial='true' %}
+  {% include 'search/search_scripts.html' %}
+  {% endwith %}
+{% endblock extra_script %}
